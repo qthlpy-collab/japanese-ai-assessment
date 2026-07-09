@@ -25,6 +25,7 @@ export interface ScoreResult {
   taskId: string;
   track: Track;
   overall: number;
+  source?: string;
   dimensions: Record<ScoreDimension, number>;
   risk: ErrorRisk;
   strengths: string[];

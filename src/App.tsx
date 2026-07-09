@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { BookOpen, ClipboardCheck, FileText, GraduationCap, HomeIcon, Sparkles } from 'lucide-react';
 import { AssessmentTask, StoredAnswer, Track } from './types';
 import { tasks, trackInfo } from './data/tasks';
-import { scoreAnswer } from './utils/scoring';
+import { evaluateAnswer } from './utils/aiScoring';
 import { generateReport } from './utils/reportGenerator';
 
 type Page = 'home' | 'tracks' | 'assessment' | 'report' | 'materials' | 'about';
@@ -28,8 +28,8 @@ export default function App() {
     setPage('assessment');
   };
 
-  const saveAnswer = (task: AssessmentTask, answer: string) => {
-    const result = scoreAnswer(task, answer);
+  const saveAnswer = async (task: AssessmentTask, answer: string) => {
+    const result = await evaluateAnswer(task, answer);
     setAnswers((current) => {
       const next = current.filter((item) => item.task.id !== task.id);
       return [...next, { task, answer, result }];
@@ -151,7 +151,7 @@ function AssessmentPage({
   selectedTrack: Track;
   answers: StoredAnswer[];
   onTrackChange: (track: Track) => void;
-  onSubmit: (task: AssessmentTask, answer: string) => StoredAnswer['result'];
+  onSubmit: (task: AssessmentTask, answer: string) => Promise<StoredAnswer['result']>;
 }) {
   const visibleTasks = tasks.filter((task) => task.track === selectedTrack);
   const completed = answers.filter((answer) => answer.task.track === selectedTrack).length;
@@ -199,10 +199,11 @@ function TaskCard({
   task: AssessmentTask;
   number: number;
   storedAnswer?: StoredAnswer;
-  onSubmit: (task: AssessmentTask, answer: string) => StoredAnswer['result'];
+  onSubmit: (task: AssessmentTask, answer: string) => Promise<StoredAnswer['result']>;
 }) {
   const [answer, setAnswer] = useState(storedAnswer?.answer ?? '');
   const [result, setResult] = useState(storedAnswer?.result);
+  const [isScoring, setIsScoring] = useState(false);
 
   return (
     <article className="task-card">
@@ -223,13 +224,16 @@ function TaskCard({
       />
       <button
         className="primary-button"
-        onClick={() => {
-          const next = onSubmit(task, answer);
+        disabled={isScoring || answer.trim().length === 0}
+        onClick={async () => {
+          setIsScoring(true);
+          const next = await onSubmit(task, answer);
           setResult(next);
+          setIsScoring(false);
         }}
       >
         <Sparkles size={18} />
-        Submit for Simulated AI Feedback
+        {isScoring ? 'Scoring with AI...' : 'Submit for AI Feedback'}
       </button>
       {result && <FeedbackPanel result={result} />}
     </article>
@@ -247,6 +251,10 @@ function FeedbackPanel({ result }: { result: StoredAnswer['result'] }) {
         <div>
           <span>Chinese Learner Error Risk</span>
           <strong>{result.risk}</strong>
+        </div>
+        <div>
+          <span>Scoring Source</span>
+          <strong className="source-label">{result.source ?? 'AI evaluation'}</strong>
         </div>
       </div>
       <ScoreBars scores={result.dimensions} max={5} />
