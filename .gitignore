@@ -1,5 +1,7 @@
 node_modules
 dist
+.next
+out
 .env
 .DS_Store
 npm-debug.log*
@@ -7,3 +9,7 @@ npm-debug.log*
 vite.config.js
 vite.config.d.ts
 work/*.log
+
+.vercel
+.env*
+!.env.example

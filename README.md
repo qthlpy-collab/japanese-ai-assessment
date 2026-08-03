@@ -1,91 +1,243 @@
-# AI-Based Japanese Proficiency Assessment System
+# AI-Based Japanese Proficiency Assessment and Learning Evaluation System
 
-A web prototype for MP6: an AI-style Japanese proficiency assessment system for Chinese learners.
+This project is a complete MP6 educational experiment data analysis system for Chinese learners of Japanese. It supports a single-group pre-test, AI-assisted learning session, immediate post-test, delayed post-test, and questionnaire workflow.
 
-The prototype uses task-based assessment inspired by IELTS and TOEFL, with two tracks:
+The default dataset is simulated and is intended to demonstrate the analysis workflow, not prove educational effectiveness.
 
-- Academic Japanese Assessment
-- Daily Life Japanese Assessment
+## Research Design
 
-The app can run in two modes:
+The system is designed for approximately 10 participants:
 
-- Real AI scoring through a Vercel Serverless Function at `api/evaluate.ts`
-- Simulated fallback scoring when the API route or API key is unavailable
+1. Pre-test
+2. AI Learning Session, approximately two hours
+3. Immediate Post-test
+4. Delayed Post-test, if feasible
+5. Learner Experience Questionnaire
 
-## Features
+The analysis focuses on short-term changes in:
 
-- Track selection for academic and daily-life Japanese tasks
-- Six assessment tasks with Japanese answer input
-- Simulated AI scoring across task completion, grammar, vocabulary, keigo, and fluency
-- Chinese learner error-risk diagnosis
-- AI-style feedback with strengths, weaknesses, error types, suggestions, sample answers, and Chinese explanations
-- Diagnostic report with score bars and recommended learning materials
-- GitHub Pages deployment workflow
-- Vercel API route for secure OpenAI API calls
+- Vocabulary Recognition Memory
+- Vocabulary Recall Memory
+- Contextual Usage Memory
+- Conversational Response Memory
+- Grammar and Form Memory
+- Response time
+- Learner experience questionnaire responses
 
-## Local Commands
+## Technology Stack
+
+- Next.js 15
+- TypeScript
+- React
+- Tailwind CSS
+- shadcn/ui-style local components
+- Recharts
+- Papa Parse
+- Vitest
+- GitHub Actions-ready
+- Vercel-compatible deployment
+
+## Installation
 
 ```bash
 npm install
+```
+
+## Development
+
+```bash
 npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+## Test
+
+```bash
+npm run test
+```
+
+## Production Build
+
+```bash
 npm run build
 ```
 
-## Real AI Scoring
+## CSV Schema
 
-Do not put your API key in React source code, GitHub Pages, or any committed file.
+The sample CSV is available at:
 
-For local Vercel development, create a local `.env` file:
+```text
+public/data/simulated-learning-data.csv
+```
+
+Required fields:
+
+```text
+participantId,
+ageGroup,
+japaneseLevel,
+aiExperience,
+vocabularyRecognitionPre,
+vocabularyRecognitionPost,
+vocabularyRecognitionDelayed,
+vocabularyRecallPre,
+vocabularyRecallPost,
+vocabularyRecallDelayed,
+contextualUsagePre,
+contextualUsagePost,
+contextualUsageDelayed,
+conversationPre,
+conversationPost,
+conversationDelayed,
+grammarPre,
+grammarPost,
+grammarDelayed,
+responseTimePre,
+responseTimePost,
+responseTimeDelayed,
+perceivedUsefulness,
+feedbackClarity,
+learningEngagement,
+confidenceImprovement,
+cognitiveLoad,
+intentionToReuse
+```
+
+Score fields use 0-100. Questionnaire fields use 1-5 Likert values. Response time is measured in seconds.
+
+## Statistical Methods
+
+Descriptive statistics include:
+
+- N
+- Mean
+- Median
+- Standard deviation
+- Minimum
+- Maximum
+- Interquartile range
+- Mean gain
+- Median gain
+- Percentage change
+
+Individual gain score:
+
+```text
+Gain Score = Post-test - Pre-test
+```
+
+Classification:
+
+- Improved: gain > 0
+- No Change: gain = 0
+- Declined: gain < 0
+
+Retention rate:
+
+```text
+Retention Rate = Delayed Post-test Score / Immediate Post-test Score * 100%
+```
+
+If immediate post-test is 0, the app returns null to avoid division by zero.
+
+## Wilcoxon Signed-Rank Test
+
+Because of the small sample size, the Wilcoxon signed-rank test is treated as the primary inferential analysis.
+
+The implementation uses a normal approximation. Zero differences are removed, and tied absolute differences receive average ranks. The interface reports:
+
+- W statistic
+- Effective sample size
+- p-value
+- Statistical significance at alpha = 0.05
+- Direction of median change
+- Effect size r
+
+Effect size:
+
+```text
+r = |Z| / sqrt(N)
+```
+
+Interpretation:
+
+- r < 0.10: negligible
+- 0.10-0.29: small
+- 0.30-0.49: medium
+- 0.50 or above: large
+
+## Multiple Comparisons
+
+The app displays raw p-values and Holm-adjusted p-values. Results are not interpreted from p-values alone.
+
+## Questionnaire Analysis
+
+Likert items are summarized using:
+
+- Median
+- Interquartile range
+- Frequency distribution
+- Percentage selecting 4 or 5
+
+Single Likert items are not treated as continuous outcomes for complex inference.
+
+## Simulated Data Disclaimer
+
+The top of the dashboard displays:
+
+```text
+DEMONSTRATION WITH SIMULATED DATA
+```
+
+The included dataset is fixed and manually specified to represent plausible variation. It should be replaced with real experimental data before reporting actual study results.
+
+## Deployment
+
+### Vercel
+
+This project is Vercel-compatible:
 
 ```bash
-OPENAI_API_KEY=your_real_key_here
-OPENAI_MODEL=gpt-4.1-mini
+npm run build
 ```
 
-For Vercel deployment, add the key in:
+Then import the GitHub repository in Vercel.
 
-```text
-Vercel Project -> Settings -> Environment Variables
-```
+### GitHub
 
-Add:
-
-```text
-OPENAI_API_KEY = your_real_key_here
-OPENAI_MODEL = gpt-4.1-mini
-```
-
-The frontend calls `/api/evaluate`. On Vercel this route is handled by `api/evaluate.ts`, so the key stays on the server. On GitHub Pages, this API route does not exist, so the app falls back to simulated scoring.
-
-## GitHub Pages
-
-The Vite base path is configured in `vite.config.ts`:
-
-```ts
-base: '/japanese-ai-assessment/'
-```
-
-This should match the GitHub repository name. If the repository name changes, update the base path before deployment.
-
-GitHub Pages is static hosting only. It can show the prototype, but real OpenAI scoring requires Vercel or another serverless/backend host.
-
-## Deployment Steps
+A normal GitHub workflow can run:
 
 ```bash
-git init
-git add .
-git commit -m "Initial AI Japanese assessment prototype"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/japanese-ai-assessment.git
-git push -u origin main
+npm install
+npm run test
+npm run build
 ```
 
-Then enable GitHub Pages:
+For static GitHub Pages, Next.js needs additional static export configuration. Vercel is recommended for this version.
 
-Repository Settings -> Pages -> Source: GitHub Actions
+## Limitations
 
-Final URL format:
+- Simulated default data
+- Small sample size
+- No control group
+- Short two-hour intervention
+- Possible test familiarity effect
+- Possible ceiling effects among higher-level learners
+- Self-report questionnaire bias
+- Reduced response time does not necessarily indicate improved language quality
+- Correlation does not establish causation
 
-```text
-https://YOUR_USERNAME.github.io/japanese-ai-assessment/
-```
+## Future Work
+
+- Replace simulated data with real experimental CSV files
+- Add authenticated researcher accounts
+- Add long-term delayed post-test tracking
+- Add anonymized student IDs
+- Add PDF report export
+- Add teacher/class dashboards
+- Add optional AI-assisted qualitative feedback coding
