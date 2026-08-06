@@ -208,17 +208,37 @@ npm run build
 
 Then import the GitHub repository in Vercel.
 
-### GitHub
+### GitHub Pages
 
-A normal GitHub workflow can run:
+This project is configured for GitHub Pages static deployment. `next.config.ts` uses:
+
+```ts
+output: 'export'
+basePath: '/japanese-ai-assessment'
+assetPrefix: '/japanese-ai-assessment/'
+```
+
+The GitHub Actions workflow runs:
 
 ```bash
-npm install
+npm ci
 npm run test
 npm run build
 ```
 
-For static GitHub Pages, Next.js needs additional static export configuration. Vercel is recommended for this version.
+Then uploads the generated `out/` folder to GitHub Pages.
+
+Enable Pages in:
+
+```text
+Repository Settings -> Pages -> Source: GitHub Actions
+```
+
+Published URL:
+
+```text
+https://qthlpy-collab.github.io/japanese-ai-assessment/
+```
 
 ## Limitations
 
