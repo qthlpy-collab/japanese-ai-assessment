@@ -13,6 +13,8 @@ import type {
 } from './types';
 
 const dimensions = memoryDimensions.map((dimension) => dimension.key) as ExamDimension[];
+const politeExpressionPattern =
+  /\u3067\u3059|\u307e\u3059|\u304a\u9858|\u3044\u305f\u3060|\u7533\u3057\u307e\u3059|\u3067\u3057\u3087\u3046\u304b/;
 
 export function scoreQuestion(question: ExamQuestion, answer: string) {
   const normalized = answer.trim();
@@ -25,7 +27,7 @@ export function scoreQuestion(question: ExamQuestion, answer: string) {
   const keywordHits = question.expectedKeywords.filter((keyword) => normalized.includes(keyword)).length;
   const keywordScore = (keywordHits / Math.max(1, question.expectedKeywords.length)) * question.maxScore;
   const lengthBonus = normalized.length >= 45 ? 2 : normalized.length >= 20 ? 1 : 0;
-  const politenessBonus = /です|ます|お願|いただ|申します|でしょうか/.test(normalized) ? 2 : 0;
+  const politenessBonus = politeExpressionPattern.test(normalized) ? 2 : 0;
   return Math.min(question.maxScore, Math.round(keywordScore + lengthBonus + politenessBonus));
 }
 

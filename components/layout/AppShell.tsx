@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { BarChart3, ClipboardList, Database, FileText, Home, Table2, Upload, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -14,6 +17,9 @@ const navItems = [
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  if (pathname.startsWith('/exam')) return <>{children}</>;
+
   return (
     <div className="min-h-screen">
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-[var(--border)] bg-white p-5 lg:block">
