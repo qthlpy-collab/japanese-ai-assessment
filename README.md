@@ -24,6 +24,32 @@ The analysis focuses on short-term changes in:
 - Response time
 - Learner experience questionnaire responses
 
+## Exam Collection Workflow
+
+The app includes an `Exam Collection` page for running a small participant exam before analysis. It is designed for ten planned participants, P01-P10.
+
+Workflow:
+
+1. Select a participant ID.
+2. Confirm age group, Japanese level, and AI experience.
+3. Complete the Pre-test before the AI learning session.
+4. Complete the Immediate Post-test after the session.
+5. Complete the Delayed Post-test several days later, if possible.
+6. Complete the Likert questionnaire.
+7. Export CSV or load completed rows directly into the analysis pages.
+
+Each test stage contains five tasks mapped to the project variables:
+
+- vocabularyRecognition
+- vocabularyRecall
+- contextualUsage
+- conversation
+- grammar
+
+Multiple-choice questions are scored by exact match. Open-ended responses are scored with a transparent rule template using expected keywords, answer length, and polite Japanese expressions. The exported CSV uses 0-100 score fields so it can be imported into the existing dashboard, charts, Wilcoxon analysis, and results summary pages.
+
+The collection page stores raw answers in browser localStorage. This is sufficient for a prototype and classroom demonstration, but formal data collection should use anonymized IDs, consent procedures, and a more durable storage workflow.
+
 ## Technology Stack
 
 - Next.js 15

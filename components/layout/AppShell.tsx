@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { BarChart3, Database, FileText, Home, Table2, Upload, Users } from 'lucide-react';
+import { BarChart3, ClipboardList, Database, FileText, Home, Table2, Upload, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: Home },
+  { href: '/exam', label: 'Exam Collection', icon: ClipboardList },
   { href: '/analysis', label: 'Analysis', icon: BarChart3 },
   { href: '/participants', label: 'Participants', icon: Users },
   { href: '/table', label: 'Data Table', icon: Table2 },
