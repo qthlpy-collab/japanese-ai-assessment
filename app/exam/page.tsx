@@ -18,6 +18,12 @@ import type { ExamStage, ParticipantExamRecord, ParticipantProfile, Questionnair
 const storageKey = 'mp6-standalone-exam-records-v2';
 const participantIds = Array.from({ length: 10 }, (_, index) => `P${String(index + 1).padStart(2, '0')}`);
 const stageKeys: ExamStage[] = ['Pre', 'Post', 'Delayed'];
+const aiExperienceOptions = [
+  { value: 'None', label: '无' },
+  { value: 'Low', label: '较少' },
+  { value: 'Medium', label: '一般' },
+  { value: 'High', label: '较多' }
+];
 
 function createInitialRecords(): ParticipantExamRecord[] {
   return participantIds.map((participantId, index) => {
@@ -49,10 +55,18 @@ function targetField(stage: ExamStage, dimension: string) {
 }
 
 function stageName(stage: ExamStage | 'Questionnaire') {
-  if (stage === 'Pre') return 'PRE TEST';
-  if (stage === 'Post') return 'IMMEDIATE POST TEST';
-  if (stage === 'Delayed') return 'DELAYED POST TEST';
-  return 'QUESTIONNAIRE';
+  if (stage === 'Pre') return '前测';
+  if (stage === 'Post') return '即时后测';
+  if (stage === 'Delayed') return '延迟后测';
+  return '学习体验问卷';
+}
+
+function questionTypeLabel(type: string) {
+  if (type === 'multiple-choice') return '选择题';
+  if (type === 'short-answer') return '简答题';
+  if (type === 'situational-writing') return '情境写作';
+  if (type === 'conversation-response') return '对话应答';
+  return type;
 }
 
 export default function StandaloneExamPage() {
@@ -63,7 +77,7 @@ export default function StandaloneExamPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [questionnaire, setQuestionnaire] = useState<QuestionnaireResponse>(defaultQuestionnaire);
   const [startedAt, setStartedAt] = useState(new Date().toISOString());
-  const [notice, setNotice] = useState('READY. Please select participant and begin the test.');
+  const [notice, setNotice] = useState('系统已就绪。请选择参与者编号并开始答题。');
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
@@ -86,6 +100,7 @@ export default function StandaloneExamPage() {
   );
   const exportRows = useMemo(() => recordsToParticipantRows(records), [records]);
   const readyCount = records.filter(canExportParticipant).length;
+  const selectedSummary = completionSummary(selectedRecord);
 
   useEffect(() => {
     if (!selectedRecord) return;
@@ -110,6 +125,11 @@ export default function StandaloneExamPage() {
 
   function saveStage() {
     if (selectedStage === 'Questionnaire') return;
+    const missingCount = currentQuestions.filter((question) => !answers[question.id]?.trim()).length;
+    if (missingCount > 0) {
+      setNotice(`还有 ${missingCount} 题未完成。请完成本部分所有题目后再保存。`);
+      return;
+    }
     const submission = scoreStage(selectedRecord.profile, selectedStage, answers, startedAt);
     setRecords((current) =>
       current.map((record) =>
@@ -118,7 +138,7 @@ export default function StandaloneExamPage() {
           : record
       )
     );
-    setNotice(`${selectedParticipantId} ${stageName(selectedStage)} SAVED. Total score = ${submission.totalScore}/100.`);
+    setNotice(`${selectedParticipantId} 的${stageName(selectedStage)}已保存。总分：${submission.totalScore}/100。`);
   }
 
   function saveQuestionnaire() {
@@ -129,12 +149,12 @@ export default function StandaloneExamPage() {
           : record
       )
     );
-    setNotice(`${selectedParticipantId} QUESTIONNAIRE SAVED.`);
+    setNotice(`${selectedParticipantId} 的学习体验问卷已保存。`);
   }
 
   function exportCsv() {
     if (!exportRows.length) {
-      setNotice('NO COMPLETE PARTICIPANT ROWS. Complete Pre, Post, Delayed, and Questionnaire first.');
+      setNotice('暂无可导出的完整记录。请至少完成一名参与者的前测、即时后测、延迟后测和问卷。');
       return;
     }
     downloadFile('mp6-collected-exam-data.csv', participantsToCsv(exportRows), 'text/csv;charset=utf-8');
@@ -146,11 +166,11 @@ export default function StandaloneExamPage() {
 
   function loadIntoAnalysis() {
     if (!exportRows.length) {
-      setNotice('NO DATA LOADED. Complete at least one participant record first.');
+      setNotice('暂无可载入分析系统的数据。请至少完成一名参与者的完整记录。');
       return;
     }
     setImportedParticipants(exportRows);
-    setNotice(`${exportRows.length} COMPLETE ROW(S) LOADED INTO ANALYSIS PAGES.`);
+    setNotice(`已将 ${exportRows.length} 名参与者的完整记录载入分析系统。`);
   }
 
   function resetAll() {
@@ -161,7 +181,7 @@ export default function StandaloneExamPage() {
     setAnswers({});
     setQuestionnaire(defaultQuestionnaire());
     window.localStorage.removeItem(storageKey);
-    setNotice('ALL LOCAL EXAM RECORDS CLEARED.');
+    setNotice('本机浏览器中的考试记录已清空。');
   }
 
   return (
@@ -172,14 +192,14 @@ export default function StandaloneExamPage() {
             <tr>
               <td className="border-2 border-black bg-[#000080] p-2 text-center text-white">
                 <h1 className="text-2xl font-bold md:text-3xl" style={{ fontFamily: 'Times New Roman, serif' }}>
-                  MP6 JAPANESE EXAM WEB PAGE
+                  MP6 日语学习实验考试系统
                 </h1>
-                <p className="text-xs">Standalone participant test site - best viewed at 800x600</p>
+                <p className="text-xs">独立考试网页 - 面向参与者答题与研究数据采集</p>
               </td>
             </tr>
             <tr>
               <td className="border-2 border-black bg-[#ffff99] p-2 text-center text-xs font-bold text-[#800000]">
-                NOTICE: This page collects real participant answers in this browser. Export CSV after the test.
+                注意：本页面用于收集参与者真实答题数据。完成后请导出 CSV 并妥善保存。
               </td>
             </tr>
           </tbody>
@@ -189,38 +209,50 @@ export default function StandaloneExamPage() {
           <tbody>
             <tr>
               <td className="border border-black p-2">
-                <b>Participants planned:</b> 10
+                <b>预计参与者：</b>10 人
               </td>
               <td className="border border-black p-2">
-                <b>Export ready:</b> {readyCount}/10
+                <b>可导出记录：</b>{readyCount}/10
               </td>
               <td className="border border-black p-2">
-                <b>CSV rows:</b> {exportRows.length}
+                <b>CSV 行数：</b>{exportRows.length}
               </td>
               <td className="border border-black p-2">
-                <b>Scoring:</b> transparent rule template
+                <b>评分方式：</b>规则模板自动评分
               </td>
             </tr>
           </tbody>
         </table>
 
         <div className="mt-2 border-2 border-black bg-[#ffffff] p-2 text-xs">
-          <b>STATUS:</b> {notice}
+          <b>当前状态：</b> {notice}
           <br />
           <a className="text-[#0000ee] underline" href="#bank">
-            Jump to question bank
+            查看题库与字段映射
           </a>
           {' | '}
           <Link className="text-[#0000ee] underline" href="/">
-            Open analysis system
+            打开数据分析系统
           </Link>
         </div>
+
+        <table className="mt-2 w-full border-collapse border-2 border-black bg-[#ffffcc] text-xs">
+          <tbody>
+            <tr>
+              <td className="border border-black p-2 font-bold">使用流程</td>
+              <td className="border border-black p-2">
+                1. 选择参与者编号 → 2. 核对基本信息 → 3. 完成前测 → 4. AI 学习后完成即时后测 → 5. 数日后完成延迟后测 →
+                6. 填写问卷 → 7. 导出 CSV 或载入分析系统。
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         <table className="mt-2 w-full border-collapse border-2 border-black bg-[#f5f5f5] text-sm">
           <tbody>
             <tr className="align-top">
               <td className="w-full border border-black p-2 md:w-[250px]">
-                <div className="border-2 border-[#808080] bg-[#dcdcdc] p-1 font-bold">PARTICIPANT LIST</div>
+                <div className="border-2 border-[#808080] bg-[#dcdcdc] p-1 font-bold">参与者列表</div>
                 <div className="mt-2 grid grid-cols-2 gap-1">
                   {records.map((record) => {
                     const summary = completionSummary(record);
@@ -237,16 +269,16 @@ export default function StandaloneExamPage() {
                       >
                         <b>{record.profile.participantId}</b>
                         <br />
-                        {summary.exportReady ? 'READY' : `${summary.completeStages}/3 TESTS`}
+                        {summary.exportReady ? '可导出' : `${summary.completeStages}/3 已完成`}
                       </button>
                     );
                   })}
                 </div>
 
                 <div className="mt-3 border border-black bg-white p-2">
-                  <b>{selectedRecord.profile.participantId} PROFILE</b>
+                  <b>{selectedRecord.profile.participantId} 基本信息</b>
                   <label className="mt-2 block text-xs">
-                    Age Group
+                    年龄段
                     <input
                       className="mt-1 w-full border-2 border-[#808080] bg-white px-1"
                       value={selectedRecord.profile.ageGroup}
@@ -254,7 +286,7 @@ export default function StandaloneExamPage() {
                     />
                   </label>
                   <label className="mt-2 block text-xs">
-                    Japanese Level
+                    日语水平
                     <select
                       className="mt-1 w-full border-2 border-[#808080] bg-white px-1"
                       value={selectedRecord.profile.japaneseLevel}
@@ -266,14 +298,16 @@ export default function StandaloneExamPage() {
                     </select>
                   </label>
                   <label className="mt-2 block text-xs">
-                    AI Experience
+                    AI 使用经验
                     <select
                       className="mt-1 w-full border-2 border-[#808080] bg-white px-1"
                       value={selectedRecord.profile.aiExperience}
                       onChange={(event) => updateProfile('aiExperience', event.target.value)}
                     >
-                      {['None', 'Low', 'Medium', 'High'].map((level) => (
-                        <option key={level}>{level}</option>
+                      {aiExperienceOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
                       ))}
                     </select>
                   </label>
@@ -281,22 +315,22 @@ export default function StandaloneExamPage() {
 
                 <div className="mt-3 grid gap-1">
                   <button className="border-2 border-black bg-[#ffff99] px-2 py-1 font-bold" onClick={exportCsv} type="button">
-                    EXPORT CSV
+                    导出 CSV 数据
                   </button>
                   <button className="border-2 border-black bg-[#ddddff] px-2 py-1" onClick={exportJson} type="button">
-                    EXPORT RAW JSON
+                    导出原始答案 JSON
                   </button>
                   <button className="border-2 border-black bg-[#ccffcc] px-2 py-1" onClick={loadIntoAnalysis} type="button">
-                    LOAD TO ANALYSIS
+                    载入分析系统
                   </button>
                   <button className="border-2 border-black bg-[#ffcccc] px-2 py-1" onClick={resetAll} type="button">
-                    CLEAR LOCAL DATA
+                    清空本机记录
                   </button>
                 </div>
               </td>
 
               <td className="border border-black p-2">
-                <div className="mb-2 border-2 border-[#808080] bg-[#dcdcdc] p-1 font-bold">TEST MENU</div>
+                <div className="mb-2 border-2 border-[#808080] bg-[#dcdcdc] p-1 font-bold">考试部分选择</div>
                 <div className="mb-3 flex flex-wrap gap-1">
                   {[...stageKeys, 'Questionnaire' as const].map((stage) => (
                     <button
@@ -315,19 +349,46 @@ export default function StandaloneExamPage() {
                 <table className="mb-3 w-full border-collapse border border-black bg-white text-xs">
                   <tbody>
                     <tr>
-                      <td className="border border-black bg-[#eeeeee] p-1 font-bold">Current examinee</td>
+                      <td className="border border-black bg-[#eeeeee] p-1 font-bold">当前参与者</td>
                       <td className="border border-black p-1">{selectedRecord.profile.participantId}</td>
-                      <td className="border border-black bg-[#eeeeee] p-1 font-bold">Current section</td>
+                      <td className="border border-black bg-[#eeeeee] p-1 font-bold">当前部分</td>
                       <td className="border border-black p-1">{stageName(selectedStage)}</td>
                     </tr>
+                    <tr>
+                      <td className="border border-black bg-[#eeeeee] p-1 font-bold">完成进度</td>
+                      <td className="border border-black p-1">{selectedSummary.completeStages}/3 个测试部分</td>
+                      <td className="border border-black bg-[#eeeeee] p-1 font-bold">问卷状态</td>
+                      <td className="border border-black p-1">{selectedSummary.questionnaireComplete ? '已完成' : '未完成'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <table className="mb-3 w-full border-collapse border border-black bg-white text-xs">
+                  <thead>
+                    <tr className="bg-[#dcdcdc]">
+                      <th className="border border-black p-1 text-left">已保存部分</th>
+                      <th className="border border-black p-1 text-left">总分</th>
+                      <th className="border border-black p-1 text-left">答题时间</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stageKeys.map((stage) => {
+                      const submission = selectedRecord.stages[stage];
+                      return (
+                        <tr key={stage}>
+                          <td className="border border-black p-1">{stageName(stage)}</td>
+                          <td className="border border-black p-1">{submission ? `${submission.totalScore}/100` : '未保存'}</td>
+                          <td className="border border-black p-1">{submission ? `${submission.elapsedSeconds} 秒` : '未记录'}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
 
                 {selectedStage !== 'Questionnaire' ? (
                   <div>
                     <p className="mb-3 border border-black bg-[#ffffcc] p-2 text-xs">
-                      {examStages.find((stage) => stage.key === selectedStage)?.purpose} Response time starts when this section is
-                      opened. Press SAVE SECTION when the participant finishes.
+                      {examStages.find((stage) => stage.key === selectedStage)?.purpose} 打开本部分后会自动记录答题时间。参与者完成所有题目后，请点击“保存本部分”。
                     </p>
 
                     {currentQuestions.map((question, index) => (
@@ -339,7 +400,7 @@ export default function StandaloneExamPage() {
                                 Q{index + 1}. {question.title}
                               </td>
                               <td className="w-[220px] border border-black bg-[#eeeeee] p-1">
-                                Target: {targetField(question.stage, question.dimension)}
+                                对应字段：{targetField(question.stage, question.dimension)}
                               </td>
                             </tr>
                           </tbody>
@@ -368,29 +429,28 @@ export default function StandaloneExamPage() {
                           />
                         )}
                         <p className="mt-2 text-[11px]">
-                          <b>Scoring:</b> {question.scoringNote} Raw item score is {question.maxScore}; exported score is scaled to
-                          0-100.
+                          <b>评分说明：</b>{question.scoringNote} 原始题目分值为 {question.maxScore} 分，导出时换算为 0-100 分。
                         </p>
                       </div>
                     ))}
 
                     <button className="border-4 border-black bg-[#00ff00] px-4 py-2 font-bold" onClick={saveStage} type="button">
-                      SAVE SECTION
+                      保存本部分
                     </button>
                     <button
                       className="ml-2 border-2 border-black bg-[#eeeeee] px-3 py-2"
                       onClick={() => {
                         setStartedAt(new Date().toISOString());
-                        setNotice(`${selectedRecord.profile.participantId} timer restarted.`);
+                        setNotice(`${selectedRecord.profile.participantId} 的计时已重新开始。`);
                       }}
                       type="button"
                     >
-                      RESTART TIMER
+                      重新计时
                     </button>
                   </div>
                 ) : (
                   <div className="border-2 border-black bg-white p-2">
-                    <p className="mb-2 bg-[#ffffcc] p-2 text-xs">Likert scale: 1 = strongly disagree, 5 = strongly agree.</p>
+                    <p className="mb-2 bg-[#ffffcc] p-2 text-xs">李克特量表：1 = 非常不同意，5 = 非常同意。</p>
                     {questionnairePrompts.map((item) => (
                       <label className="mb-2 grid gap-2 border border-[#808080] bg-[#f7f7f7] p-2 text-sm md:grid-cols-[1fr_120px]" key={item.key}>
                         <span>{item.label}</span>
@@ -410,7 +470,7 @@ export default function StandaloneExamPage() {
                       </label>
                     ))}
                     <button className="border-4 border-black bg-[#00ff00] px-4 py-2 font-bold" onClick={saveQuestionnaire} type="button">
-                      SAVE QUESTIONNAIRE
+                      保存问卷
                     </button>
                   </div>
                 )}
@@ -421,30 +481,30 @@ export default function StandaloneExamPage() {
 
         <table className="mt-2 w-full border-collapse border-2 border-black bg-white text-xs">
           <caption id="bank" className="border-2 border-b-0 border-black bg-[#800000] p-1 text-left font-bold text-white">
-            READY-TO-USE QUESTION BANK AND VARIABLE MAPPING
+            可直接使用的考试题库与数据字段映射
           </caption>
           <thead>
             <tr className="bg-[#dcdcdc]">
-              <th className="border border-black p-1 text-left">Stage</th>
-              <th className="border border-black p-1 text-left">Question</th>
-              <th className="border border-black p-1 text-left">Variable</th>
-              <th className="border border-black p-1 text-left">Type</th>
+              <th className="border border-black p-1 text-left">阶段</th>
+              <th className="border border-black p-1 text-left">题目</th>
+              <th className="border border-black p-1 text-left">数据字段</th>
+              <th className="border border-black p-1 text-left">题型</th>
             </tr>
           </thead>
           <tbody>
             {examQuestions.map((question) => (
               <tr key={question.id}>
-                <td className="border border-black p-1">{question.stage}</td>
+                <td className="border border-black p-1">{stageName(question.stage)}</td>
                 <td className="border border-black p-1">{question.title}</td>
                 <td className="border border-black p-1">{targetField(question.stage, question.dimension)}</td>
-                <td className="border border-black p-1">{question.type}</td>
+                <td className="border border-black p-1">{questionTypeLabel(question.type)}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
         <p className="mt-2 border-2 border-black bg-[#ffff99] p-2 text-center text-xs">
-          Copyright 1999-style MP6 Exam Page. Data stays local until exported.
+          版权所有：廖鹏宇。数据在导出前仅保存在当前浏览器。
         </p>
       </div>
     </main>
