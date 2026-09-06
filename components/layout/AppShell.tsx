@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 AI-Based Japanese Proficiency Assessment and Learning Evaluation System
               </p>
             </div>
-            <Badge className="bg-[#fee9df] text-[var(--accent)]">DEMONSTRATION WITH SIMULATED DATA</Badge>
+            <Badge className="bg-[#e7f7f3] text-[var(--success)]">ROUND-ONE EXPERIMENT DATA</Badge>
           </div>
         </header>
         <main className="px-4 py-6 lg:px-8">{children}</main>

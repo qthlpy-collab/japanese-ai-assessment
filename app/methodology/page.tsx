@@ -44,7 +44,7 @@ const sections = [
   {
     title: 'Limitations',
     content:
-      'The default dataset is simulated and demonstrates workflow only. A two-hour intervention is short, there is no control group, test familiarity may influence gains, ceiling effects may affect high-level learners, and self-report questionnaire responses may contain bias.'
+      'The round-one dataset is small. A two-hour intervention is short, there is no control group, test familiarity may influence gains, ceiling effects may affect high-level learners, and self-report questionnaire responses may contain bias.'
   }
 ];
 

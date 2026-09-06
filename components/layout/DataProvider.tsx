@@ -1,23 +1,23 @@
 'use client';
 
 import { createContext, useContext, useMemo, useState } from 'react';
-import { simulatedParticipants } from '@/data/simulatedParticipants';
+import { experimentParticipants } from '@/data/experimentParticipants';
 import type { Participant } from '@/lib/data/types';
 import { enrichParticipants } from '@/lib/data/transformations';
 
 interface ExperimentDataContextValue {
   rawParticipants: Participant[];
   participants: ReturnType<typeof enrichParticipants>;
-  dataSource: 'simulated' | 'imported';
+  dataSource: 'round-one' | 'imported';
   setImportedParticipants: (participants: Participant[]) => void;
-  resetToSimulated: () => void;
+  resetToDefaultDataset: () => void;
 }
 
 const ExperimentDataContext = createContext<ExperimentDataContextValue | null>(null);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [rawParticipants, setRawParticipants] = useState<Participant[]>(simulatedParticipants);
-  const [dataSource, setDataSource] = useState<'simulated' | 'imported'>('simulated');
+  const [rawParticipants, setRawParticipants] = useState<Participant[]>(experimentParticipants);
+  const [dataSource, setDataSource] = useState<'round-one' | 'imported'>('round-one');
   const participants = useMemo(() => enrichParticipants(rawParticipants), [rawParticipants]);
 
   return (
@@ -30,9 +30,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           setRawParticipants(next);
           setDataSource('imported');
         },
-        resetToSimulated: () => {
-          setRawParticipants(simulatedParticipants);
-          setDataSource('simulated');
+        resetToDefaultDataset: () => {
+          setRawParticipants(experimentParticipants);
+          setDataSource('round-one');
         }
       }}
     >

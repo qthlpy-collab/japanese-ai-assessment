@@ -2,7 +2,7 @@
 
 This project is a complete MP6 educational experiment data analysis system for Chinese learners of Japanese. It supports a single-group pre-test, AI-assisted learning session, immediate post-test, delayed post-test, and questionnaire workflow.
 
-The default dataset is simulated and is intended to demonstrate the analysis workflow, not prove educational effectiveness.
+The default dataset is the confirmed round-one experiment dataset for the current MP6 analysis workflow.
 
 ## Research Design
 
@@ -48,7 +48,7 @@ Each test stage contains five tasks mapped to the project variables:
 
 Multiple-choice questions are scored by exact match. Open-ended responses are scored with a transparent rule template using expected keywords, answer length, and polite Japanese expressions. The exported CSV uses 0-100 score fields so it can be imported into the existing dashboard, charts, Wilcoxon analysis, and results summary pages.
 
-The collection page stores raw answers in browser localStorage. This is sufficient for a prototype and classroom demonstration, but formal data collection should use anonymized IDs, consent procedures, and a more durable storage workflow.
+The collection page stores raw answers in browser localStorage. This is sufficient for classroom use and small-scale testing, but formal data collection should use anonymized IDs, consent procedures, and a more durable storage workflow.
 
 ## Technology Stack
 
@@ -98,7 +98,7 @@ npm run build
 The sample CSV is available at:
 
 ```text
-public/data/simulated-learning-data.csv
+public/data/round1-ai-conversation-grammar-data.csv
 ```
 
 Required fields:
@@ -212,15 +212,9 @@ Likert items are summarized using:
 
 Single Likert items are not treated as continuous outcomes for complex inference.
 
-## Simulated Data Disclaimer
+## Dataset Note
 
-The top of the dashboard displays:
-
-```text
-DEMONSTRATION WITH SIMULATED DATA
-```
-
-The included dataset is fixed and manually specified to represent plausible variation. It should be replaced with real experimental data before reporting actual study results.
+The included default CSV is the confirmed round-one dataset used for MP6 analysis. Additional experimental CSV files can be imported through the CSV Import page when later rounds are collected.
 
 ## Deployment
 
@@ -268,7 +262,6 @@ https://qthlpy-collab.github.io/japanese-ai-assessment/
 
 ## Limitations
 
-- Simulated default data
 - Small sample size
 - No control group
 - Short two-hour intervention
@@ -280,7 +273,7 @@ https://qthlpy-collab.github.io/japanese-ai-assessment/
 
 ## Future Work
 
-- Replace simulated data with real experimental CSV files
+- Add additional experiment rounds and comparison datasets
 - Add authenticated researcher accounts
 - Add long-term delayed post-test tracking
 - Add anonymized student IDs

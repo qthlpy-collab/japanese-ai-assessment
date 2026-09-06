@@ -22,7 +22,7 @@ export default function ResultsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Report-ready English Summary</CardTitle>
-          <CardDescription>The wording avoids causal claims and emphasizes simulated data limitations.</CardDescription>
+          <CardDescription>The wording avoids causal claims and emphasizes small-sample research limitations.</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="whitespace-pre-line text-sm leading-7 text-[var(--muted-foreground)]">{summary}</p>

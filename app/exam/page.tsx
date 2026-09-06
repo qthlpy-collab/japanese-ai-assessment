@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { examQuestions, examStages, questionnairePrompts } from '@/data/examTasks';
-import { simulatedParticipants } from '@/data/simulatedParticipants';
+import { experimentParticipants } from '@/data/experimentParticipants';
 import { useExperimentData } from '@/components/layout/DataProvider';
 import { participantsToCsv } from '@/lib/data/parser';
 import {
@@ -21,7 +21,7 @@ const stageKeys: ExamStage[] = ['Pre', 'Post', 'Delayed'];
 
 function createInitialRecords(): ParticipantExamRecord[] {
   return participantIds.map((participantId, index) => {
-    const sample = simulatedParticipants[index];
+    const sample = experimentParticipants[index];
     return {
       profile: {
         participantId,

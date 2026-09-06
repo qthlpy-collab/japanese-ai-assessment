@@ -1,8 +1,8 @@
-import { simulatedParticipants } from '@/data/simulatedParticipants';
+import { experimentParticipants } from '@/data/experimentParticipants';
 import { ParticipantDetailClient } from './ParticipantDetailClient';
 
 export function generateStaticParams() {
-  return simulatedParticipants.map((participant) => ({
+  return experimentParticipants.map((participant) => ({
     id: participant.participantId
   }));
 }

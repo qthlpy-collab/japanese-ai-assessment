@@ -34,14 +34,13 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <section className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Badge className="mb-3 bg-[#fee9df] text-[var(--accent)]">DEMONSTRATION WITH SIMULATED DATA</Badge>
           <h2 className="text-3xl font-black tracking-tight">Educational Experiment Dashboard</h2>
           <p className="mt-2 max-w-3xl text-[var(--muted-foreground)]">
             Single-group pre-test, AI learning session, immediate post-test, delayed post-test, and questionnaire
             analysis for Chinese learners of Japanese.
           </p>
         </div>
-        <Badge className={dataSource === 'simulated' ? '' : 'bg-[#e7f7f3] text-[var(--success)]'}>
+        <Badge className={dataSource === 'round-one' ? '' : 'bg-[#e7f7f3] text-[var(--success)]'}>
           Data source: {dataSource}
         </Badge>
       </section>
@@ -64,7 +63,7 @@ export default function DashboardPage() {
             <CardTitle>Interpretation warning</CardTitle>
             <CardDescription>
               This system demonstrates an analytical workflow. Reduced response time does not necessarily indicate
-              improved language quality, and single-group simulated results do not establish causation.
+              improved language quality, and single-group results do not establish causation.
             </CardDescription>
           </div>
         </CardHeader>

@@ -9,7 +9,7 @@ import { parseParticipantCsv } from '@/lib/data/parser';
 import type { Participant } from '@/lib/data/types';
 
 export default function ImportPage() {
-  const { setImportedParticipants, resetToSimulated } = useExperimentData();
+  const { setImportedParticipants, resetToDefaultDataset } = useExperimentData();
   const [previewRows, setPreviewRows] = useState<Participant[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -26,26 +26,26 @@ export default function ImportPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-black tracking-tight">CSV Import</h2>
-        <p className="mt-2 text-[var(--muted-foreground)]">Upload real experimental data to replace the local simulated dataset for this browser session.</p>
+        <p className="mt-2 text-[var(--muted-foreground)]">Upload experimental data to replace the current browser-session dataset.</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Upload CSV</CardTitle>
-          <CardDescription>Refresh the browser to return to default simulated data, or use the reset button below.</CardDescription>
+          <CardDescription>Refresh the browser to return to the default round-one dataset, or use the reset button below.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border)] bg-white p-8 text-center">
             <Upload className="mb-3 text-[var(--primary)]" />
             <span className="font-semibold">Choose CSV file</span>
-            <span className="text-sm text-[var(--muted-foreground)]">Required schema matches public/data/simulated-learning-data.csv</span>
+            <span className="text-sm text-[var(--muted-foreground)]">Required schema matches public/data/round1-ai-conversation-grammar-data.csv</span>
             <input className="hidden" type="file" accept=".csv,text/csv" onChange={(event) => onFile(event.target.files?.[0])} />
           </label>
           <div className="flex gap-3">
             <Button disabled={errors.length > 0 || previewRows.length === 0} onClick={() => setImportedParticipants(previewRows)}>
               Confirm and Load Dataset
             </Button>
-            <Button variant="outline" onClick={resetToSimulated}>Restore Simulated Data</Button>
+            <Button variant="outline" onClick={resetToDefaultDataset}>Restore Default Dataset</Button>
           </div>
         </CardContent>
       </Card>
