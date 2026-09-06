@@ -1,0 +1,11 @@
+participantId,ageGroup,japaneseLevel,aiExperience,vocabularyRecognitionPre,vocabularyRecognitionPost,vocabularyRecognitionDelayed,vocabularyRecallPre,vocabularyRecallPost,vocabularyRecallDelayed,contextualUsagePre,contextualUsagePost,contextualUsageDelayed,conversationPre,conversationPost,conversationDelayed,grammarPre,grammarPost,grammarDelayed,responseTimePre,responseTimePost,responseTimeDelayed,perceivedUsefulness,feedbackClarity,learningEngagement,confidenceImprovement,cognitiveLoad,intentionToReuse
+P01,18-22,N4,Low,48,60,57,35,43,40,38,50,47,34,61,56,42,67,63,146,111,119,5,5,5,5,3,5
+P02,18-22,N3,Medium,62,71,68,50,57,54,53,64,60,49,72,68,57,78,74,121,91,98,5,5,4,5,2,5
+P03,23-27,N4,Low,45,55,52,32,39,36,36,48,44,40,64,59,39,66,61,158,119,127,5,4,5,4,3,5
+P04,18-22,N2,High,74,81,79,65,70,68,67,75,72,60,78,75,70,86,83,103,82,88,4,5,4,4,2,4
+P05,23-27,N3,Medium,58,63,60,46,50,47,48,55,51,44,58,53,52,65,60,130,112,120,4,4,3,4,4,4
+P06,18-22,N5,None,36,51,47,24,33,29,28,42,38,25,56,50,31,59,53,181,132,145,5,5,5,5,4,5
+P07,28-32,N3,Low,55,66,63,44,51,49,50,62,58,47,73,68,49,75,70,139,101,110,5,4,5,5,3,5
+P08,18-22,N2,Medium,79,85,83,68,74,71,71,80,77,66,84,80,73,90,87,98,79,85,4,5,4,4,2,5
+P09,23-27,N4,None,41,54,50,29,37,33,34,47,43,32,60,54,36,62,57,166,120,133,5,4,5,4,3,5
+P10,28-32,N3,High,64,73,70,53,60,57,55,65,61,52,75,70,59,80,75,116,88,96,4,5,4,5,2,5
