@@ -13,3 +13,9 @@ work/*.log
 .vercel
 .env*
 !.env.example
+.research-data/
+.next-pages/
+.next-e2e/
+playwright-report/
+test-results/
+*.local.json

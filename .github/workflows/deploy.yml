@@ -34,12 +34,16 @@ jobs:
         run: npm run test
 
       - name: Build static site
-        run: npm run build
+        run: npm run build:pages
+        env:
+          GITHUB_PAGES: 'true'
+          NEXT_PUBLIC_STATIC_HOST: 'true'
+          NEXT_PUBLIC_API_URL: ${{ vars.RESEARCH_API_URL }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: out
+          path: .next-pages
 
   deploy:
     environment:

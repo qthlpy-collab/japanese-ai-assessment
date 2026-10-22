@@ -4,7 +4,7 @@ const sections = [
   {
     title: 'Research Design',
     content:
-      'The system supports a single-group pre-test, AI-assisted learning session, immediate post-test, delayed post-test, and learner questionnaire design. The intended sample size is approximately ten Chinese-background Japanese learners.'
+      'The system supports fixed explanations, direct AI correction and AI guided self-correction. Every participant completes independent pre/post tests; a delayed test is scheduled from the submitted post-test time. Condition and form order are recorded. Ten participants are suitable for workflow piloting, not a sufficiently powered three-arm effectiveness claim.'
   },
   {
     title: 'Small Sample Limitation',
@@ -14,7 +14,7 @@ const sections = [
   {
     title: 'Why Wilcoxon Was Selected',
     content:
-      'The Wilcoxon signed-rank test is appropriate for paired pre/post comparisons when normality cannot be assumed. This implementation uses a normal approximation, removes zero differences, and uses average ranks for tied absolute differences.'
+      'Wilcoxon is a paired analysis, with a symmetric distribution of paired differences required for a location-shift interpretation. Zero differences are removed and ties receive average ranks. For at most 20 nonzero pairs this implementation uses exact conditional sign randomization; above 20 it uses a tie-corrected normal approximation without continuity correction. Z-based effect sizes remain approximate.'
   },
   {
     title: 'Effect Size',
@@ -44,7 +44,7 @@ const sections = [
   {
     title: 'Limitations',
     content:
-      'The round-one dataset is small. A two-hour intervention is short, there is no control group, test familiarity may influence gains, ceiling effects may affect high-level learners, and self-report questionnaire responses may contain bias.'
+      'Authored forms follow one blueprint but are not psychometrically equated. Text conversation tasks do not measure speaking or pronunciation. Learning duration is elapsed wall-clock time, not verified active engagement. Small samples, transfer between related items, ceiling effects and self-report bias remain possible. The pooled dashboard does not test between-condition effects. Plan a baseline-adjusted condition contrast and justify sample size by the primary outcome and precision or power before a confirmatory study.'
   }
 ];
 

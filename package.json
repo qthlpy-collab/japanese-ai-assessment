@@ -4,10 +4,14 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "tsx server/start.ts --dev",
     "build": "next build",
-    "start": "next start",
-    "test": "vitest run tests"
+    "start": "tsx server/start.ts",
+    "test": "vitest run tests",
+    "typecheck": "tsc --noEmit",
+    "setup": "tsx server/setup.ts",
+    "build:pages": "node server/build-pages.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -19,9 +23,11 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^3.1.0",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "tsx": "^4.20.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^22.16.5",
     "@types/papaparse": "^5.3.16",
@@ -29,6 +35,9 @@
     "@types/react-dom": "^19.1.6",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "vitest": "^5.0.5"
+  },
+  "overrides": {
+    "postcss": "^8.5.23"
   }
 }

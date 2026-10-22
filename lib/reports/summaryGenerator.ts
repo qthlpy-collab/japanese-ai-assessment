@@ -19,6 +19,7 @@ export function generateParticipantSummary(participant: EnrichedParticipant) {
 }
 
 export function generateResultsSummary(participants: EnrichedParticipant[]) {
+  if(!participants.length)return 'No reviewed complete-case records are loaded. Collect and score responses before generating a results summary.';
   const n = participants.length;
   const totalPreMedian = round(median(participants.map((p) => p.totalPre)));
   const totalPostMedian = round(median(participants.map((p) => p.totalPost)));
@@ -44,5 +45,5 @@ export function generateResultsSummary(participants: EnrichedParticipant[]) {
 
   const totalStats = describe(participants.map((p) => p.totalGain));
 
-  return `In the current round-one dataset, ${n} Chinese-background Japanese learners completed a single-group pre-test, AI-assisted learning session, immediate post-test, and delayed post-test workflow. The median total memory score increased from ${totalPreMedian} before learning to ${totalPostMedian} immediately after the session, with a mean total gain of ${totalGainMean}. The delayed median score was ${totalDelayedMedian}, and the average total retention rate was ${retentionMean}%. Changes by memory dimension were as follows: ${dimensionSentences} The mean total gain was ${round(totalStats.mean)} with an interquartile range of ${round(totalStats.iqr)}. Questionnaire responses were generally positive: ${satisfaction.join('; ')}. Because the dataset includes only ten participants, lacks a control group, and represents a short two-hour intervention, the findings should not be interpreted as proving AI effectiveness or establishing long-term educational impact.`;
+  return `The currently loaded complete-case dataset contains ${n} participants. The median total score was ${totalPreMedian} at pre-test and ${totalPostMedian} at immediate post-test, with a mean gain of ${totalGainMean}. The delayed median was ${totalDelayedMedian}; average delayed/immediate retention was ${retentionMean}%. ${dimensionSentences} The gain interquartile range was ${round(totalStats.iqr)}. Questionnaire results: ${satisfaction.join('; ')}. These pooled within-participant comparisons do not estimate differences between feedback conditions. Missing and unreviewed cases are excluded from this dashboard. Confirm dataset provenance, form equivalence, learning duration and the planned comparison before interpreting results. Small samples, test familiarity, ceiling effects, self-report bias and a short intervention limit conclusions. Report adjusted p-values alongside effect sizes and uncertainty; statistical detectability alone does not establish educational importance.`;
 }

@@ -44,9 +44,8 @@ function averageRanks(absDiffs: number[]) {
 }
 
 export function wilcoxonSignedRank(pre: number[], post: number[], alpha = 0.05): WilcoxonResult {
-  const pairs = pre
-    .map((preValue, index) => ({ diff: post[index] - preValue }))
-    .filter(({ diff }) => Number.isFinite(diff) && diff !== 0);
+  const differences = pre.map((preValue,index)=>Number.isFinite(preValue)&&Number.isFinite(post[index]) ? post[index]-preValue : NaN).filter(Number.isFinite);
+  const pairs = differences.filter(diff=>diff!==0).map(diff=>({diff}));
   const n = pairs.length;
   if (n === 0) {
     return {
@@ -67,10 +66,19 @@ export function wilcoxonSignedRank(pre: number[], post: number[], alpha = 0.05):
   const wNegative = pairs.reduce((sum, pair, index) => sum + (pair.diff < 0 ? ranks[index] : 0), 0);
   const w = Math.min(wPositive, wNegative);
   const expected = (n * (n + 1)) / 4;
-  const variance = (n * (n + 1) * (2 * n + 1)) / 24;
+  // Conditional random-sign variance automatically accounts for average tied ranks.
+  const variance = ranks.reduce((sum,rank)=>sum+rank*rank,0)/4;
   const z = variance === 0 ? 0 : (wPositive - expected) / Math.sqrt(variance);
-  const pValue = Math.min(1, 2 * (1 - normalCdf(Math.abs(z))));
-  const medianDiff = median(pairs.map(({ diff }) => diff)) ?? 0;
+  let pValue = Math.min(1, 2 * (1 - normalCdf(Math.abs(z))));
+  if(n<=20){
+    // Twice-ranks are integers, including average ranks. DP enumerates the sign distribution.
+    const counts=new Map<number,number>([[0,1]]);
+    for(const rank of ranks){const old=[...counts];for(const [sum,count] of old)counts.set(sum+Math.round(rank*2),(counts.get(sum+Math.round(rank*2))??0)+count);}
+    const distance=Math.abs(wPositive-expected);let extreme=0;
+    for(const [twiceSum,count] of counts)if(Math.abs(twiceSum/2-expected)>=distance-1e-10)extreme+=count;
+    pValue=Math.min(1,extreme/2**n);
+  }
+  const medianDiff = median(differences) ?? 0;
 
   return {
     w,
@@ -81,6 +89,6 @@ export function wilcoxonSignedRank(pre: number[], post: number[], alpha = 0.05):
     pValue,
     significant: pValue < alpha,
     direction: medianDiff > 0 ? 'median increase' : medianDiff < 0 ? 'median decrease' : 'no median change',
-    method: 'Normal approximation; zero differences removed; average ranks used for ties'
+    method: n<=20 ? 'Exact conditional random-sign test; zero differences removed; tied average ranks; Z uses tied-rank variance without continuity correction' : 'Normal approximation; zero differences removed; tied-rank variance; no continuity correction'
   };
 }

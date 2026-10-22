@@ -4,9 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BarChart3, ClipboardList, Database, FileText, Home, Table2, Upload, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from 'react';
+import { callApi } from '@/lib/study/client';
+import { useExperimentData } from './DataProvider';
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: Home },
+  { href: '/admin', label: 'Study Management', icon: ClipboardList },
+  { href: '/dashboard', label: 'Dashboard', icon: Home },
   { href: '/exam', label: 'Exam Collection', icon: ClipboardList },
   { href: '/analysis', label: 'Analysis', icon: BarChart3 },
   { href: '/participants', label: 'Participants', icon: Users },
@@ -17,8 +21,13 @@ const navItems = [
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  if (pathname.startsWith('/exam')) return <>{children}</>;
+  const pathname = usePathname() ?? '/';
+  const standalone=pathname==='/'||pathname.startsWith('/exam')||pathname.startsWith('/admin');
+  const [authenticated,setAuthenticated]=useState(false);
+  const { participants, dataSource }=useExperimentData();
+  useEffect(()=>{if(standalone)return;const token=sessionStorage.getItem('mp6-admin-session');if(!token){setAuthenticated(false);return;}void callApi('admin.ping',{},token).then(()=>setAuthenticated(true)).catch(()=>setAuthenticated(false));},[standalone,pathname]);
+  if (standalone) return <>{children}</>;
+  if (!authenticated) return <main className="admin-main"><h1 className="text-2xl font-bold">Researcher Access</h1><p className="my-4">Sign in to open the English analysis workspace.</p><Link className="underline" href="/admin">Administrator sign in</Link></main>;
 
   return (
     <div className="min-h-screen">
@@ -54,10 +63,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 AI-Based Japanese Proficiency Assessment and Learning Evaluation System
               </p>
             </div>
-            <Badge className="bg-[#e7f7f3] text-[var(--success)]">ROUND-ONE EXPERIMENT DATA</Badge>
+            <Badge className="bg-[#e7f7f3] text-[var(--success)]">{dataSource.toUpperCase()} · N={participants.length}</Badge>
           </div>
         </header>
-        <main className="px-4 py-6 lg:px-8">{children}</main>
+        <nav className="flex flex-wrap gap-3 border-b p-4 lg:hidden">{navItems.map(i=><Link className="text-sm underline" key={i.href} href={i.href}>{i.label}</Link>)}</nav>
+        <main className="px-4 py-6 lg:px-8">{participants.length===0&&!pathname.startsWith('/import')?<div className="py-10"><h2 className="text-xl font-bold">No analysis data loaded</h2><p className="my-3">Load reviewed complete cases from Study Management → Exports, or import a scored CSV.</p><Link className="underline mr-6" href="/admin">Study Management</Link><Link className="underline" href="/import">Import CSV</Link></div>:children}</main>
       </div>
     </div>
   );

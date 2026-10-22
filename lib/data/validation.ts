@@ -47,7 +47,7 @@ export function validateParticipants(rows: Partial<Participant>[]): ValidationRe
       if (scoreFields.includes(field) && !questionnaireFields.includes(String(field)) && (value < 0 || value > 100)) {
         errors.push(`Row ${rowNumber}: ${String(field)} must be in 0-100`);
       }
-      if (questionnaireFields.includes(String(field)) && (value < 1 || value > 5)) {
+      if (questionnaireFields.includes(String(field)) && (!Number.isInteger(value) || value < 1 || value > 5)) {
         errors.push(`Row ${rowNumber}: ${String(field)} must be in 1-5`);
       }
       if (String(field).startsWith('responseTime') && value < 0) {

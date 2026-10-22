@@ -19,7 +19,7 @@ export function parseParticipantCsv(file: File): Promise<{ rows: Participant[]; 
         const rows = result.data.map((raw) => {
           const row: Record<string, string | number> = {};
           csvFields.forEach((field) => {
-            row[field] = numericFields.includes(field) ? Number(raw[field]) : raw[field];
+            row[field] = numericFields.includes(field) ? raw[field]?.trim() ? Number(raw[field]) : NaN : raw[field];
           });
           return row as unknown as Participant;
         });
